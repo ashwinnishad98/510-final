@@ -1,0 +1,6 @@
+streamlit
+requests
+black
+isort
+python-dotenv
+openai
