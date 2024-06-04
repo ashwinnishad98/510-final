@@ -68,6 +68,41 @@ def filter_by_sentiment(articles, selected_sentiment):
         return filtered_articles
     return articles
 
+def fetch_and_filter_news():
+    # Fetch news based on search query and selected topics
+    if st.session_state.search_query:
+        if st.session_state.selected_topics:
+            st.markdown(f'<div class="subheader-font">Results for: {st.session_state.search_query} in {", ".join(st.session_state.selected_topics)}</div>', unsafe_allow_html=True)
+            combined_query = f"{st.session_state.search_query} AND {' AND '.join(st.session_state.selected_topics)}"
+            news_data = fetch_news([combined_query])
+        else:
+            st.markdown(f'<div class="subheader-font">Results for: {st.session_state.search_query}</div>', unsafe_allow_html=True)
+            news_data = fetch_news([st.session_state.search_query])
+    else:
+        if st.session_state.selected_topics:
+            st.markdown(f'<div class="subheader-font">Results for: {", ".join(st.session_state.selected_topics)}</div>', unsafe_allow_html=True)
+            news_data = fetch_news(st.session_state.selected_topics)
+        else:
+            st.markdown('<div class="subheader-font">Trending Topics</div>', unsafe_allow_html=True)
+            st.markdown("---")
+            news_data = fetch_news(['trending'])
+
+    if news_data.get('status') == 'error':
+        st.error(f"Error fetching news: {news_data.get('message')}")
+        return []
+
+    articles = news_data.get('articles', [])
+
+    # Apply date filter
+    if st.session_state.selected_date:
+        articles = filter_by_date(articles, st.session_state.selected_date)
+
+    # Apply sentiment filter
+    if st.session_state.selected_sentiment:
+        articles = filter_by_sentiment(articles, st.session_state.selected_sentiment)
+
+    return articles
+
 def home():
     st.markdown("""
     <style>
@@ -101,18 +136,17 @@ def home():
 
     st.markdown('<div class="big-font">News.AI</div>', unsafe_allow_html=True)
 
-
     # Initialize session state variables
     if 'articles_shown' not in st.session_state:
         st.session_state.articles_shown = 10
     if 'selected_topics' not in st.session_state:
-        st.session_state.selected_topics = None
+        st.session_state.selected_topics = []
     if 'selected_date' not in st.session_state:
-        st.session_state.selected_date = None
+        st.session_state.selected_date = ""
     if 'selected_sentiment' not in st.session_state:
-        st.session_state.selected_sentiment = None
+        st.session_state.selected_sentiment = ""
     if 'search_query' not in st.session_state:
-        st.session_state.search_query = None
+        st.session_state.search_query = ""
 
     # Filters in a single row
     col1, col2, col3 = st.columns(3)
@@ -122,21 +156,21 @@ def home():
         if selected_topics:
             st.session_state.selected_topics = selected_topics
         else:
-            st.session_state.selected_topics = None
+            st.session_state.selected_topics = []
 
     with col2:
         selected_date = st.selectbox("Filter by date", options=[""] + DATE_OPTIONS, index=0, format_func=lambda x: "Choose an option" if x == "" else x)
         if selected_date:
             st.session_state.selected_date = selected_date
         else:
-            st.session_state.selected_date = None
+            st.session_state.selected_date = ""
 
     with col3:
         selected_sentiment = st.selectbox("Filter by sentiment", options=[""] + SENTIMENT_OPTIONS, index=0, format_func=lambda x: "Choose an option" if x == "" else x)
         if selected_sentiment:
             st.session_state.selected_sentiment = selected_sentiment
         else:
-            st.session_state.selected_sentiment = None
+            st.session_state.selected_sentiment = ""
 
     # Search bar underneath the filters
     search_query = st.text_input("Search for news topics", "")
@@ -145,33 +179,10 @@ def home():
             st.session_state.search_query = search_query
             st.session_state.articles_shown = 10  # Reset articles shown count on new search
         else:
-            st.session_state.search_query = None
+            st.session_state.search_query = ""
 
-    # Fetch news based on search query and selected topics
-    if st.session_state.search_query:
-        if st.session_state.selected_topics:
-            st.markdown(f'<div class="subheader-font">Results for: {st.session_state.search_query} in {", ".join(st.session_state.selected_topics)}</div>', unsafe_allow_html=True)
-            combined_query = f"{st.session_state.search_query} AND {' AND '.join(st.session_state.selected_topics)}"
-            news_data = fetch_news([combined_query])
-        else:
-            st.markdown(f'<div class="subheader-font">Results for: {st.session_state.search_query} in {", ".join(st.session_state.selected_topics)}</div>', unsafe_allow_html=True)
-            news_data = fetch_news([st.session_state.search_query])
-    else:
-        st.markdown('<div class="subheader-font">Trending Topics</div>', unsafe_allow_html=True)
-        st.markdown("---")
-        news_data = fetch_news(['trending'])
-
-    if news_data.get('status') == 'error':
-        st.error(f"Error fetching news: {news_data.get('message')}")
-        return
-
-    articles = news_data.get('articles', [])
-
-    # Apply date filter
-    articles = filter_by_date(articles, st.session_state.selected_date)
-
-    # Apply sentiment filter
-    articles = filter_by_sentiment(articles, st.session_state.selected_sentiment)
+    # Fetch and filter news
+    articles = fetch_and_filter_news()
 
     # Show only the first `articles_shown` articles
     for article in articles[:st.session_state.articles_shown]:
@@ -214,7 +225,7 @@ def home():
     if st.session_state.articles_shown < len(articles):
         if st.button("Show More"):
             st.session_state.articles_shown += 10
-            st.experimental_rerun()  # Rerun to update the displayed articles
+            st.rerun()  # Rerun to update the displayed articles
 
     st.markdown('</div>', unsafe_allow_html=True)
 

@@ -1,22 +1,17 @@
 import streamlit as st
 from home import home
-from user_registration import user_registration
-from profile_setup import profile_setup
-from personalized_feed import personalized_feed
+from f1_analytics import f1_analytics
 
 # Main function to control the navigation
 def main():
+    # Render the sidebar for navigation
     st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to", ["Home", "User Registration", "Profile Setup", "Personalized News Feed"])
+    page = st.sidebar.radio("Go to", ["Home", "Formula 1 Analytics"])
     
     if page == "Home":
         home()
-    elif page == "User Registration":
-        user_registration()
-    elif page == "Profile Setup":
-        profile_setup()
-    elif page == "Personalized News Feed":
-        personalized_feed()
+    elif page == "Formula 1 Analytics":
+        f1_analytics()
 
 if __name__ == "__main__":
     main()

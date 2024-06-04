@@ -4,3 +4,4 @@ black
 isort
 python-dotenv
 openai
+fastf1

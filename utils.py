@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import requests
 from openai import OpenAI
+import requests
 
 # Load environment variables from .env file
 load_dotenv()
@@ -11,6 +12,9 @@ NEWS_API_KEY = os.getenv('NEWS_API_KEY')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+BASE_URL = "https://ergast.com/api/f1"
+
 
 def fetch_news(topics):
     if not topics:
@@ -66,3 +70,19 @@ def get_key_phrases(text):
     # Ensure only up to 5 key phrases are returned
     key_phrases = key_phrases[:5]
     return ', '.join(key_phrases)
+
+def get_driver_standings(season="current"):
+    url = f"{BASE_URL}/{season}/driverStandings.json"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']
+    else:
+        return []
+
+def get_constructor_standings(season="current"):
+    url = f"{BASE_URL}/{season}/constructorStandings.json"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings']
+    else:
+        return []
