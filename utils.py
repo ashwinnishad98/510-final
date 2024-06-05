@@ -9,8 +9,8 @@ from firebase_config import initialize_firebase
 db = initialize_firebase()
 
 # API Key for NewsAPI and OpenAI
-NEWS_API_KEY = st.secrets("NEWS_API_KEY")
-OPENAI_API_KEY = st.secrets("OPENAI_API_KEY")
+NEWS_API_KEY = st.secrets["NEWS_API_KEY"]
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 

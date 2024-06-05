@@ -5,8 +5,8 @@ import pandas as pd
 import plotly.express as px
 
 
-BLS_API_KEY = st.secrets("BLS_API_KEY")
-STOCKS_API_KEY = st.secrets("STOCKS_API_KEY")
+BLS_API_KEY = st.secrets["BLS_API_KEY"]
+STOCKS_API_KEY = st.secrets["STOCKS_API_KEY"]
 
 
 # load CSS file
