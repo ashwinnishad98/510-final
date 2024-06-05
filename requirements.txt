@@ -4,4 +4,7 @@ black
 isort
 python-dotenv
 openai
-fastf1
+firebase-admin
+plotly
+seaborn
+openpyxl
