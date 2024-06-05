@@ -1,5 +1,4 @@
-import os
-from dotenv import load_dotenv
+import streamlit as st
 import requests
 from openai import OpenAI
 from datetime import datetime
@@ -9,12 +8,9 @@ from firebase_config import initialize_firebase
 
 db = initialize_firebase()
 
-# oad environment variables
-load_dotenv()
-
 # API Key for NewsAPI and OpenAI
-NEWS_API_KEY = os.getenv("NEWS_API_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+NEWS_API_KEY = st.secrets("NEWS_API_KEY")
+OPENAI_API_KEY = st.secrets("OPENAI_API_KEY")
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 

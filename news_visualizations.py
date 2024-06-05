@@ -3,13 +3,10 @@ import requests
 import os
 import pandas as pd
 import plotly.express as px
-from dotenv import load_dotenv
 
-# load environment variables from .env file
-load_dotenv()
 
-BLS_API_KEY = os.getenv("BLS_API_KEY")
-STOCKS_API_KEY = os.getenv("STOCKS_API_KEY")
+BLS_API_KEY = st.secrets("BLS_API_KEY")
+STOCKS_API_KEY = st.secrets("STOCKS_API_KEY")
 
 
 # load CSS file
